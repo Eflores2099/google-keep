@@ -27,21 +27,22 @@ class App {
             this.handleFormClick(event) 
             this.selectNote(event)
             this.openModal(event)
+            this.deleteNote(event)
         })
 
-        document.body.addEventListener('mouseover', event => {
+        document.body.addEventListener("mouseover", event => {
             this.openTooltip(event)
         })
 
-        document.body.addEventListener('mouseout', event => {
+        document.body.addEventListener("mouseout", event => {
             this.closeTooltip(event)
         })
         
-        document.$colorTooltip.addEventListener('mouseover', function() {
+        this.$colorTooltip.addEventListener("mouseover", function() {
             this.style.display = "flex"
         })
 
-        document.$colorTooltip.addEventListener('mouseout', function() {
+        this.$colorTooltip.addEventListener("mouseout", function() {
             this.style.display = "none"
         })
 
@@ -104,6 +105,8 @@ class App {
     }
     
     openModal(event) {
+       if (event.target.closest.matches('.toolbar-delete')) return
+        
        if (event.target.closest('.note')) {
             this.$modal.classList.toggle('open-modal')
             this.$modalTitle.value = this.title
@@ -116,7 +119,7 @@ class App {
         this.$modal.classList.toggle('open-modal')
     }
 
-    openToolTip(event) {
+    openTooltip(event) {
         if (!event.target.matches('.toolbar-color')) return
         this.id = event.target.dataset.id
         const noteCoords = event.target.getBoundingClientRect()
@@ -126,7 +129,7 @@ class App {
         this.$colorTooltip.style.display = 'flex'
     }
 
-    closeToolTip(event) {
+    closeTooltip(event) {
         if (!event.target.matches('.toolbar-color')) return
         this.$colorTooltip.style.display = 'none'
     }
@@ -168,13 +171,24 @@ class App {
       this.id = $selectedNote.dataset.id
     }
 
+    deleteNote() {
+       event.stopPropagation()
+       if (!event.target.matches('.toolbar-delete')) return
+        const id = event.target.dataset.id
+        this.notes.filter(note => note.id !== Number(id))
+        this.displayNotes()
+    }
+
+
+
+
     displayNotes() {
         const hasNotes = this.notes.length > 0
         this.$placeholder.style.display = hasNotes ? "none" : "flex"
 
         this.$notes.innerHTML = this.notes
-        .map
-        (note => `
+        .map(
+        note => `
             <div style = "background: ${note.color}" class = "note" data-id = "${note.id}">
                 <div class = "${note.title && "note-title"}">${note.title}</div>
                 <div class = "note-text">${note.text}</div>
